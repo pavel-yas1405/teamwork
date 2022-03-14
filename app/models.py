@@ -20,3 +20,12 @@ class Post(db.Model):
     def __repr__(self):
         return '<Post {}>'.format(self.body)
 
+class Ingredients(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    description = db.Column(db.Text, nullable=True)
+    origin = db.Column(db.String(128), index=True, unique=True)
+
+    def __repr__(self):
+        return '<Ingredients {} {} {}'.format(self.name, self.description, self.origin)
+
