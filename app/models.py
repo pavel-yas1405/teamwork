@@ -23,7 +23,7 @@ class Ingredient(db.Model):
      
 
      def __repr__(self):
-         return '<Ingredients {} {} {}'.format(self.name, self.description, self.origin)
+         return '<Ingredient {} {} {}'.format(self.name, self.description, self.origin)
 
 class Cocktail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
