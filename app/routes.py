@@ -18,4 +18,19 @@ def login():
         
     return render_template('login.html', title='Sign In', form=form)    
     
-    
+
+@app.route('/create_ingredient', methods=['POST'])
+
+def create_ingredient():
+    name = name
+    description = description
+    origin = origin
+
+    db.session.add(ingredient)
+    db.session.commit()
+    return render_template(page_title=name, description=description, origin=origin)
+
+@app.route('/ingredient')
+def ingredient_id():
+    return Ingredient.query.get(ingredient_id)
+
