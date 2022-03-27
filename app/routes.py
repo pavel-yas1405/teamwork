@@ -39,72 +39,45 @@ def ingredient_id():
     return Ingredient.query.get(ingredient_id)
 
 
-@app.route('/create_cocktail', methods=['POST'])
-
-def create_cocktail():
-    request_data = json.loads(request.data)
-    name = request_data['name']
-    description = request_data['description']
-    origin = request_data['origin']
-    recipe = request_data['recipe']
-
-    new_cocktail = Cocktail(
-        name=name,
-        description=description,
-        origin=origin,
-        recipe=recipe
-    )
-
-    db.session.add(new_cocktail)
-    db.session.commit()
-
-    response = app.response_class(
-        response=json.dumps({'result_info': 'Запись ингредиента создана'}),
-        mimetype='application/json'
-    )
-    return response 
-
 @app.route('/cocktail')
 def cocktail():
     cocktails = db.session.query(Cocktail).all()
-    return render_template('cocktail.html', cocktails=cocktails)
+    title = "Коктейли"
+    return render_template('cocktail.html', cocktails=cocktails, title=title)
 
 @app.route('/cocktail/new', methods=['GET', 'POST'])
-def newCocktail():
+def new_cocktail():
     if request.method == 'POST':
-        newCocktail = Cocktail(name=request.form['name'], description=request.form['description'], origin=request.form['origin'], recipe=request.form['recipe'])
-        db.session.add(newCocktail)
+        new_cocktail = Cocktail(name=request.form['name'], description=request.form['description'], origin=request.form['origin'], recipe=request.form['recipe'])
+        db.session.add(new_cocktail)
         db.session.commit()
         return redirect(url_for('cocktail'))
     else:
-        return render_template('newCocktail.html')
+        return render_template('new_cocktail.html')
 
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
-def editCocktail(cocktail_id):  
-    editedCocktail = db.session.query(Cocktail).filter_by(id=cocktail_id).one()  
+def edit_cocktail(cocktail_id):  
+    edited_cocktail = db.session.query(Cocktail).filter_by(id=cocktail_id).one()  
     if request.method == 'POST':  
         if request.form['name']:  
-            editedCocktail.name = request.form['name']
-            editedCocktail.description = request.form['description']
-            editedCocktail.origin = request.form['origin']
-            editedCocktail.recipe = request.form['recipe']
-            db.session.add(editedCocktail)
+            edited_cocktail.name = request.form['name']
+            edited_cocktail.description = request.form['description']
+            edited_cocktail.origin = request.form['origin']
+            edited_cocktail.recipe = request.form['recipe']
+            db.session.add(edited_cocktail)
             db.session.commit() 
             return redirect(url_for('cocktail', cocktail_id=cocktail_id))  
     else:  
-        return render_template('editCocktail.html', cocktail=editedCocktail)
+        return render_template('edit_cocktail.html', cocktail=edited_cocktail)
 
 @app.route('/cocktail/<int:cocktail_id>/delete', methods=['GET', 'POST'])
-def deleteCocktail(cocktail_id):
-    cocktailToDelete = db.session.query(Cocktail).filter_by(id=cocktail_id).one()
+def delete_cocktail(cocktail_id):
+    cocktail_to_delete = db.session.query(Cocktail).filter_by(id=cocktail_id).one()
     if request.method == 'POST':
-        db.session.delete(cocktailToDelete)
+        db.session.delete(cocktail_to_delete)
         db.session.commit()
         return redirect(url_for('cocktail', cocktail_id=cocktail_id))
     else:
-        return render_template('deleteCocktail.html', cocktail=cocktailToDelete)
+        return render_template('delete_cocktail.html', cocktail=cocktail_to_delete)
 
 
-
-    
-    
