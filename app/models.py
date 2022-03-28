@@ -49,3 +49,6 @@ class CocktailIngredient(db.Model):
         name='cocktail_id_ingredient_id_unq',
     ),
 )
+
+
+
