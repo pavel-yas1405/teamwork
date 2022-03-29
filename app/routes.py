@@ -1,7 +1,7 @@
-from urllib import response
-from flask import render_template, flash, redirect, url_for, json, request
+from re import search
+from flask import render_template, flash, redirect, url_for, request
 from app import app
-from app.forms import LoginForm, SearchForm
+from app.forms import LoginForm
 from app import db
 from app.models import Cocktail
 
@@ -43,6 +43,13 @@ def ingredient_id():
 def cocktail():
     cocktails = db.session.query(Cocktail).all()
     title = "Коктейли"
+
+    q = request.args.get('q')
+
+    if q:
+        cocktails = Cocktail.query.filter(Cocktail.name.contains(q) | Cocktail.description.contains(q)).all()
+    else:
+        cocktails = Cocktail.query.all()
     return render_template('cocktail.html', cocktails=cocktails, title=title)
 
 @app.route('/cocktail/new', methods=['GET', 'POST'])
@@ -79,5 +86,4 @@ def delete_cocktail(cocktail_id):
         return redirect(url_for('cocktail', cocktail_id=cocktail_id))
     else:
         return render_template('delete_cocktail.html', cocktail=cocktail_to_delete)
-
 

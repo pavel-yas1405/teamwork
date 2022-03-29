@@ -7,6 +7,3 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
-
-class SearchForm(FlaskForm):
-    search = StringField('search', validators = [DataRequired()])
