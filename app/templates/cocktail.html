@@ -1,6 +1,10 @@
 <html>
 <head>
   <title>{{ title }}</title>
+  <form class="d-flex" method="GET">
+    <input class="form-control me-2" type="search" placeholder="Найти коктейль" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
+    <button class="btn btn-outline-success" type="submit">Искать</button>
+</form>
 </head>  
 <body>  
  <h1>Коктейли</h1>  
