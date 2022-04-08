@@ -13,28 +13,42 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+class Origin(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    country = db.Column(db.String)
+    region = db.Column(db.String)
 
 
-class Ingredient(db.Model):
-     id = db.Column(db.Integer, primary_key=True)
-     name = db.Column(db.String(64), index=True, unique=True)
-     description = db.Column(db.Text, nullable=True)
-     origin = db.Column(db.String(128), index=True)
-     
+    def __repr__(self):
+        return '<Origin {} {} {}>'.format(self.name, self.country, self.region)
 
-     def __repr__(self):
-         return '<Ingredient {} {} {}'.format(self.name, self.description, self.origin)
+
 
 class Cocktail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    origin_id = db.Column(db.Integer, db.ForeignKey('origin.id'), index=True, nullable=False)
     name = db.Column(db.String(64), index=True, unique=True)
+    country = db.Column(db.String(64), index=True)
     description = db.Column(db.Text, nullable=True)
-    origin = db.Column (db.String(128), index=True)
+    region = db.Column (db.String(128), index=True)
     recipe = db.Column(db.Text, nullable=False)
     
 
     def __repr__(self):
-        return '<Cocktail {} {} {} {} >'.format(self.name, self.description, self.origin, self.recipe)
+        return '<Cocktail {} {} {} {} {}>'.format(self.name, self.description, self.country, self.region, self.recipe)
+
+class Ingredient(db.Model):
+     __tablename__ = 'ingredient'
+
+     id = db.Column(db.Integer, primary_key=True)
+     name = db.Column(db.String(64), index=True, unique=True)
+     description = db.Column(db.Text, nullable=True)
+     
+
+     def __repr__(self):
+         return '<Ingredient {} {}>'.format(self.name, self.description)
 
 class CocktailIngredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,3 +63,4 @@ class CocktailIngredient(db.Model):
         name='cocktail_id_ingredient_id_unq',
     ),
 )
+

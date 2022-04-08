@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm
-from app.models import Cocktail, Ingredient
-from re import search
+from app.models import Cocktail, Ingredient, Origin
+import requests, json, string
 
 @app.route('/')
 @app.route('/index')
@@ -94,6 +94,32 @@ def new_cocktail():
          return redirect(url_for('cocktail'))
      else:
          return render_template('new_cocktail.html')
+
+
+@app.route('/parse_cocktail', methods=['POST'])
+def change_url(letter):
+    alph = list(string.ascii_lowercase)
+    default_url = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?f={}'
+    for letter in alph:
+
+        new_url = default_url.format(letter)
+        cocktail_dict = requests.get(new_url).json()
+
+        drinks = cocktail_dict.get('drinks')
+        if not drinks:
+            print('NO COCKTAIL AVAILABLE FOR THIS LETTER')
+            continue
+        new_cocktails = {}
+        for cocktail in drinks:
+            new_cocktails[cocktail['strDrink']] = cocktail['strInstructions']
+            cocktail_name = cocktail['strDrink']
+            cocktail_recipe = cocktail['strInstructions']
+            new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe)
+            new_cocktails.append(new_cocktail)
+
+        db.session.bulk_save_objects(new_cocktails)
+        db.session.commit()
+        return new_cocktails
 
 
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
