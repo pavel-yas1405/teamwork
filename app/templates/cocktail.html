@@ -13,8 +13,7 @@
   </a>
   <ol>  
    {% for cocktail in cocktails %}  
-    <li> {{cocktail.name}} - {{cocktail.description}}</li>
-    <p>{{ cocktail.recipe }}</p>
+    <li> {{cocktail.name}} - {{cocktail.description}} - {{cocktail.country}} - {{cocktail.region}} - {{ cocktail.recipe }}</li>
     <a href="{{ url_for('edit_cocktail', cocktail_id = cocktail.id ) }}">  
       Изменить  
     </a>  
@@ -25,4 +24,4 @@
   {% endfor %}  
  </ol>  
  </body>  
- </html>  
+ </html> 

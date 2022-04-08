@@ -45,6 +45,7 @@ class Ingredient(db.Model):
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(64), index=True, unique=True)
      description = db.Column(db.Text, nullable=True)
+     ingredient_id = db.Column(db.Integer)
      
 
      def __repr__(self):

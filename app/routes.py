@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm
 from app.models import Cocktail, Ingredient, Origin
+from re import search
 import requests, json, string
 
 @app.route('/')
@@ -117,9 +118,9 @@ def change_url(letter):
             new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe)
             new_cocktails.append(new_cocktail)
 
-        db.session.bulk_save_objects(new_cocktails)
-        db.session.commit()
-        return new_cocktails
+    db.session.bulk_save_objects(new_cocktails)
+    db.session.commit()
+    return new_cocktails
 
 
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
@@ -146,3 +147,41 @@ def delete_cocktail(cocktail_id):
         return redirect(url_for('cocktail', cocktail_id=cocktail_id))
     else:
         return render_template('delete_cocktail.html', cocktail=cocktail_to_delete)
+
+
+@app.route('/origin')
+def origin():
+     origins = db.session.query(Origin).all()
+     title = "Родина коктейля"
+
+     q = request.args.get('q')
+
+     if q:
+         origins = Origin.query.filter(Origin.country.contains(q) | Origin.region.contains(q)).all()
+     else:
+         origins = Origin.query.all()
+     return render_template('origin.html', origins=origins, title=title)
+
+
+@app.route("/origin/<int:origin_id>/edit/", methods=['GET', 'POST'])  
+def edit_origin(origin_id):  
+    edited_origin = db.session.query(Origin).filter_by(id=origin_id).one()  
+    if request.method == 'POST':  
+        if request.form['name']:  
+            edited_origin.country = request.form['country']
+            edited_origin.region = request.form['region']
+            db.session.add(edited_origin)
+            db.session.commit() 
+            return redirect(url_for('origin', origin_id=origin_id))  
+    else:  
+        return render_template('edit_origin.html', origin=edited_origin)
+
+@app.route('/origin/<int:origin_id>/delete', methods=['GET', 'POST'])
+def delete_origin(origin_id):
+    origin_to_delete = db.session.query(Origin).filter_by(id=origin_id).one()
+    if request.method == 'POST':
+        db.session.delete(origin_to_delete)
+        db.session.commit()
+        return redirect(url_for('origin', origin_id=origin_id))
+    else:
+        return render_template('delete_origin.html', origin=origin_to_delete)
