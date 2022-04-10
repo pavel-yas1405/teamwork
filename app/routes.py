@@ -1,9 +1,10 @@
-from re import search
+import json
+import requests
 from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app.forms import LoginForm
 from app import db
-from app.models import Cocktail
+from app.models import Cocktail, Ingredient
 
 
 @app.route('/')
@@ -24,7 +25,6 @@ def login():
     
 
 @app.route('/create_ingredient', methods=['POST'])
-
 def create_ingredient():
     name = name
     description = description
@@ -37,6 +37,32 @@ def create_ingredient():
 @app.route('/ingredient')
 def ingredient_id():
     return Ingredient.query.get(ingredient_id)
+
+
+@app.route('/parser_ingredient', methods=['POST'])
+def get_ingredient():
+    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
+    request = requests.get(url)
+    data = request.text
+    ingredient = json.loads(data)
+    new_ingredients = []
+    for item in ingredient['drinks']:
+        item['name'] = item.pop('strIngredient1')
+        drink_name = item['name']
+        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
+        new_url = default_url.format(drink_name)
+        ingredient_dict = requests.get(new_url).json()
+        for item in ingredient_dict['ingredients']:
+            ingredient_name = item['strIngredient']
+            description = item['strDescription']
+            origin = 'Неизвестно'
+            new_ingredient = Ingredient(name=ingredient_name, description=description, origin=origin)
+            new_ingredients.append(new_ingredient)
+           
+        db.session.bulk_save_objects(new_ingredients)
+        db.session.commit()
+        return render_template(new_ingredients)
+
 
 
 @app.route('/cocktail')
@@ -52,6 +78,7 @@ def cocktail():
         cocktails = Cocktail.query.all()
     return render_template('cocktail.html', cocktails=cocktails, title=title)
 
+
 @app.route('/cocktail/new', methods=['GET', 'POST'])
 def new_cocktail():
     if request.method == 'POST':
@@ -61,6 +88,7 @@ def new_cocktail():
         return redirect(url_for('cocktail'))
     else:
         return render_template('new_cocktail.html')
+
 
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
 def edit_cocktail(cocktail_id):  
@@ -77,6 +105,7 @@ def edit_cocktail(cocktail_id):
     else:  
         return render_template('edit_cocktail.html', cocktail=edited_cocktail)
 
+
 @app.route('/cocktail/<int:cocktail_id>/delete', methods=['GET', 'POST'])
 def delete_cocktail(cocktail_id):
     cocktail_to_delete = db.session.query(Cocktail).filter_by(id=cocktail_id).one()
@@ -86,4 +115,6 @@ def delete_cocktail(cocktail_id):
         return redirect(url_for('cocktail', cocktail_id=cocktail_id))
     else:
         return render_template('delete_cocktail.html', cocktail=cocktail_to_delete)
+
+
 
