@@ -98,26 +98,24 @@ def new_cocktail():
 
 
 @app.route('/parse_cocktail', methods=['POST'])
-def change_url(letter):
+def change_url():
+    existed_cocktails=[x.name for x in db.session.query(Cocktail).all()]
     alph = list(string.ascii_lowercase)
     default_url = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?f={}'
+    new_cocktails = []
     for letter in alph:
-
         new_url = default_url.format(letter)
         cocktail_dict = requests.get(new_url).json()
-
         drinks = cocktail_dict.get('drinks')
         if not drinks:
             print('NO COCKTAIL AVAILABLE FOR THIS LETTER')
             continue
-        new_cocktails = {}
         for cocktail in drinks:
-            new_cocktails[cocktail['strDrink']] = cocktail['strInstructions']
             cocktail_name = cocktail['strDrink']
-            cocktail_recipe = cocktail['strInstructions']
-            new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe)
-            new_cocktails.append(new_cocktail)
-
+            if cocktail_name not in existed_cocktails:
+                cocktail_recipe = cocktail['strInstructions']
+                new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe, origin_id=1)
+                new_cocktails.append(new_cocktail)
     db.session.bulk_save_objects(new_cocktails)
     db.session.commit()
     return new_cocktails

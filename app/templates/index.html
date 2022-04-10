@@ -1,7 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Добро пожаловать!</h1>
+<form name="form1" id="form1" action="/action_page.php">
+  Выбор по ингредиенту: <select name="subject" id="subject">
+    <option value="" selected="selected">Выберите ингредиент</option>
+  </select>
+  <br><br>
+  Выбор по коктейлю: <select name="topic" id="topic">
+    <option value="" selected="selected">Выберите коктейль</option>
+  </select>
+  <br><br>
+  Выбор по региону: <select name="chapter" id="chapter">
+    <option value="" selected="selected">Выберите регион</option>
+  </select>
+  <br><br>
+  <input type="submit" value="Искать"> 
+</form>
     {% for post in posts %}
     <div><p></b></p></div>
     {% endfor %}
