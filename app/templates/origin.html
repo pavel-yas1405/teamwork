@@ -1,13 +1,21 @@
 <html>
  <head>
+  <div>
+    <a href="{{ url_for('index') }}">Home</a>
+  </div>
    <title>{{ title }}</title>
    <form class="d-flex" method="GET">
      <input class="form-control me-2" type="search" placeholder="Найти родину коктейля" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
      <button class="btn btn-outline-success" type="submit">Искать</button>
  </form>
  </head>  
- <body>  
-  <h1>Страны и регионы</h1>
+ <body>
+  <style>
+    body {
+      background-image: linear-gradient(to right, beige, yellow, red, black)  
+  }
+  </style>  
+  <h1><span style="color: black;">Страны и регионы</span></h1>
   <a href="{{ url_for('new_origin') }}">
     <button>Добавить страну происхождения</button>  
   </a>

@@ -33,7 +33,7 @@ class Cocktail(db.Model):
     country = db.Column(db.String(64), index=True)
     description = db.Column(db.Text, nullable=True)
     region = db.Column (db.String(128), index=True)
-    recipe = db.Column(db.Text, nullable=False)
+    recipe = db.Column(db.Text, nullable=True)
     
 
     def __repr__(self):

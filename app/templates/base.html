@@ -8,11 +8,9 @@
     </head>
     <body>
         <div>
-            Web:
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('ingredient') }}">Ingredient</a>
-                <a href="{{ url_for('cocktail') }}">Cocktail</a>
-                <a href="{{ url_for('origin') }}">Origin</a>
+                <a href="{{ url_for('index') }}"><span style="color: white; text-shadow: 2px 2px 5px red;">Home</span></a>
+                <a href="{{ url_for('login') }}"><span style="color: white; text-shadow: 2px 2px 5px red;">Login</span></a>
+
             </div>
         <hr>
         {% with messages = get_flashed_messages() %}
