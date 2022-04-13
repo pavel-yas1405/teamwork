@@ -2,27 +2,94 @@ import json
 import requests
 from flask import render_template, flash, redirect, url_for, request
 from app import app
-from app.forms import LoginForm
 from app import db
-from app.models import Cocktail, Ingredient
+from flask_login import LoginManager, login_user, logout_user, current_user
+from app.models import Cocktail, Ingredient, User
+from decorators import admin_required
+from app.forms import LoginForm, RegistrationForm
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 @app.route('/')
 @app.route('/index')
-
 def index():
-    return render_template('index.html', title='Home')
+    title = "Карта коктейлей"
+    return render_template('index.html', title=title)
 
-@app.route('/login', methods=['GET', 'POST'])
 
+@app.route('/login')
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    title = "Авторизация"
+    login_form = LoginForm()
+    return render_template('login.html', title=title, form=login_form)
+
+
+@app.route('/process_login', methods=['POST'])
+def process_login():
     form = LoginForm()
     if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(form.username.data, form.remember_me.data))
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            login_user(user)
+            flash('Вы успешно вошли на сайт')
+            return redirect(url_for('index'))
+
+    flash('Неправильные имя или пароль')
+    return redirect(url_for('login'))
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('Вы успешно разлогинились')
+    return redirect(url_for('index'))
+
+
+@app.route('/register')
+def register():
+    if current_user.is_authenticated:
         return redirect(url_for('index'))
-        
-    return render_template('login.html', title='Sign In', form=form)    
-    
+    form = RegistrationForm()
+    title = "Регистрация"
+    return render_template('registration.html', title=title, form=form)
+
+
+@app.route('/process_reg', methods=['POST'])
+def process_reg():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        new_user = User(username=form.username.data, email=form.email.data, role='user')
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Вы успешно зарегистрировались!')
+        return redirect(url_for('login'))
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash('Ошибка в поле {}: {}'.format(
+                    getattr(form, field).label.text,
+                    error
+                ))
+        return redirect(url_for('register'))
+
+
+@app.route('/admin')
+@admin_required
+def admin_index():
+    title = "Панель управления"
+    return render_template('admin.html', title=title)
+
 
 @app.route('/create_ingredient', methods=['POST'])
 def create_ingredient():
@@ -62,7 +129,6 @@ def get_ingredient():
         db.session.bulk_save_objects(new_ingredients)
         db.session.commit()
         return render_template(new_ingredients)
-
 
 
 @app.route('/cocktail')

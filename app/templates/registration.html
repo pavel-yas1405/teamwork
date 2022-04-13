@@ -3,34 +3,39 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div class="alert alert-warning" role="alert">
             {% for message in messages %}
-                {{ message }}<br>
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
             {% endfor %}
-        </div>
         {% endif %}
     {% endwith %}
-    
-    <h1>Войти</h1>
+
+    <h1>Регистрация</h1>
     <div class="container">
     <div class="row">
-    <div class="col-4">
-    <form action="{{ url_for('process_login') }}" method="post">
+        <div class="col-4">
+    <form action="{{ url_for('process_reg') }}" method="post">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.username.label }}<br>
+            {{ form.username.label }}
             {{ form.username() }}
         </div>
         <div class="form-group">
-            {{ form.password.label }}<br>
+            {{ form.email.label }}
+            {{ form.email() }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label }}
             {{ form.password() }}
         </div>
-        <div class="form-group form-check">
-            {{ form.remember_me() }}
-            {{ form.remember_me.label(class_='form-check-label') }}
+        <div class="form-group">
+            {{ form.password2.label }}
+            {{ form.password2() }}
         </div>
         {{ form.submit() }}
     </form>
     <div class="col-8">
-    </div>
+        </div>
+
 {% endblock %}

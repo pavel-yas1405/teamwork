@@ -1,23 +1,28 @@
-<head>
-  <title>Добавление коктейля</title>
-</head>
-<body>
-  <h1>Добавить</h1>
-  <form action="#" method="post">
-    <div class="form-group">
-      <label for="name">Название:</label>
-      <input type="text" maxlength="100" name="name" placeholder="Название коктейля">
+{% extends "base.html" %}
 
-      <label for="description">Описание:</label>
-      <input maxlength="500" name="description" placeholder="Описание">
+{% block content %}
+  <head>
+    <title>Добавление коктейля</title>
+  </head>
+  <body>
+    <h1>Добавить</h1>
+    <form action="#" method="post">
+      <div class="form-group">
+        <label for="name">Название:</label>
+        <input type="text" maxlength="100" name="name" placeholder="Название коктейля">
 
-      <label for="origin">Источник:</label>
-      <input maxlength="100" name="origin" placeholder="Источник">
+        <label for="description">Описание:</label>
+        <input maxlength="500" name="description" placeholder="Описание">
 
-      <label for="recipe">Рецепт:</label>
-      <input type="text" maxlength="500" name="recipe" placeholder="Рецепт коктейля">
+        <label for="origin">Источник:</label>
+        <input maxlength="100" name="origin" placeholder="Источник">
 
-      <button type="submit">Добавить</button>  
-    </div>
-  </form>
-</body>
+        <label for="recipe">Рецепт:</label>
+        <input type="text" maxlength="500" name="recipe" placeholder="Рецепт коктейля">
+
+        <button type="submit">Добавить</button>  
+      </div>
+    </form>
+  </body>
+
+{% endblock %}
