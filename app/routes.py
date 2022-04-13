@@ -72,6 +72,32 @@ def delete_ingredient(ingredient_id):
         return render_template('delete_ingredient.html', ingredient=ingredient_to_delete)
     
 
+@app.route('/parser_ingredient', methods=['POST'])
+def get_ingredient():
+    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
+    request = requests.get(url)
+    data = request.text
+    ingredient = json.loads(data)
+    new_ingredients = []
+    for item in ingredient['drinks']:
+        item['name'] = item.pop('strIngredient1')
+        drink_name = item['name']
+        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
+        new_url = default_url.format(drink_name)
+        ingredient_dict = requests.get(new_url).json()
+        for item in ingredient_dict['ingredients']:
+            ingredient_name = item['strIngredient']
+            description = item['strDescription']
+            origin = 'Неизвестно'
+            new_ingredient = Ingredient(name=ingredient_name, description=description, origin=origin)
+            new_ingredients.append(new_ingredient)
+           
+        db.session.bulk_save_objects(new_ingredients)
+        db.session.commit()
+        return render_template(new_ingredients)
+
+
+
 @app.route('/cocktail')
 def cocktail():
      cocktails = db.session.query(Cocktail).all()
@@ -84,6 +110,7 @@ def cocktail():
      else:
          cocktails = Cocktail.query.all()
      return render_template('cocktail.html', cocktails=cocktails, title=title)
+
 
 
 @app.route('/cocktail/new', methods=['GET', 'POST'])
@@ -121,6 +148,7 @@ def change_url():
     return new_cocktails
 
 
+
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
 def edit_cocktail(cocktail_id):  
     edited_cocktail = db.session.query(Cocktail).filter_by(id=cocktail_id).one()  
@@ -135,6 +163,7 @@ def edit_cocktail(cocktail_id):
             return redirect(url_for('cocktail', cocktail_id=cocktail_id))  
     else:  
         return render_template('edit_cocktail.html', cocktail=edited_cocktail)
+
 
 @app.route('/cocktail/<int:cocktail_id>/delete', methods=['GET', 'POST'])
 def delete_cocktail(cocktail_id):
