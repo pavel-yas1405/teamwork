@@ -161,6 +161,17 @@ def origin():
      return render_template('origin.html', origins=origins, title=title)
 
 
+@app.route('/origin/new', methods=['GET','POST'])
+def new_origin():
+    if request.method == 'POST':
+        new_origin = Origin(country=request.form['country'], region=request.form['region'])
+        db.session.add(new_origin)
+        db.session.commit()
+        return redirect(url_for('origin'))
+    else:
+        return render_template('new_origin.html')
+
+        
 @app.route("/origin/<int:origin_id>/edit/", methods=['GET', 'POST'])  
 def edit_origin(origin_id):  
     edited_origin = db.session.query(Origin).filter_by(id=origin_id).one()  
