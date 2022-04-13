@@ -1,7 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Добро пожаловать!</h1>
+
+<style>
+    body {
+    background-color: black;
+    background:url("https://immagini.quotidiano.net/?fmt=webp&url=https%3A%2F%2Fwww.quotidiano.net%2Fpolopoly_fs%2F1.4645565%21%2FhttpImage%2Fimage.jpg_gen%2Fderivatives%2Fwidescreen%2Fimage.jpg&w=720");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+p {
+  color: whitesmoke;
+  text-align: left;
+  font-size: 40px;
+}
+</style>
+
+<head>
+<style>
+.button {
+  background-color: rgb(176, 236, 186); 
+  color: black; 
+  border: 2px solid #4CAF50;
+  font-family: Arial, Helvetica, sans-serif;
+  text-shadow: 2px 2px 4px #000000;
+  padding: 15px 32px;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 48px;
+  margin: 16px 8px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  width: 360px;
+}
+.button:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+</style>
+</head>
+
+<body>
+<h2>CSS Buttons</h2>
+
+<a href="{{ url_for('ingredient') }}" class="button">ИНГРЕДИЕНТЫ</a>
+<a href="{{ url_for('cocktail') }}" class="button">КОКТЕЙЛИ</a>
+<a href="{{ url_for('origin') }}" class="button">РЕГИОНЫ</a>
+
+</body>
+
+
     {% for post in posts %}
     <div><p></b></p></div>
     {% endfor %}
