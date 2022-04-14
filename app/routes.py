@@ -1,11 +1,9 @@
-import json, string
-import requests
 from flask import render_template, flash, redirect, url_for, request
-from app import app
-from app import db
+from app import app, db
 from flask_login import LoginManager, login_user, logout_user, current_user
 from app.models import Cocktail, Ingredient, User, Origin
 from decorators import admin_required
+import requests, json, string
 from app.forms import LoginForm, RegistrationForm
 
 
@@ -23,8 +21,7 @@ def index():
     title = "Карта коктейлей"
     return render_template('index.html', title=title)
 
-
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -91,7 +88,6 @@ def admin_index():
     return render_template('admin.html', title=title)
 
 @app.route('/ingredient/new', methods=['GET','POST'])
-
 def new_ingredient():
     if request.method == 'POST':
         new_ingredient = Ingredient(name=request.form['name'], description=request.form['description'], origin=request.form['origin'])
@@ -100,6 +96,37 @@ def new_ingredient():
         return redirect(url_for('ingredient'))
     else:
         return render_template('new_ingredient.html')
+
+
+@app.route('/parser_ingredient', methods=['POST'])
+def get_ingredient():
+    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
+    request = requests.get(url)
+    data = request.text
+    ingredient = json.loads(data)
+
+    existed_ingredients = [x.name for x in db.session.query(Ingredient).all()]
+    new_ingredients = []
+    for item in ingredient['drinks']:
+        item['name'] = item.pop('strIngredient1')
+        drink_name = item['name']
+        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
+        new_url = default_url.format(drink_name)
+        ingredient_dict = requests.get(new_url).json()
+        for item in ingredient_dict['ingredients']:
+
+            ingredient_name = item['strIngredient']
+            if ingredient_name in existed_ingredients:
+                continue
+
+            description = item['strDescription']
+            new_ingredient = Ingredient(name=ingredient_name, description=description)
+            new_ingredients.append(new_ingredient)
+           
+    db.session.bulk_save_objects(new_ingredients)
+    db.session.commit()
+    return {'message': f'Создано {len(new_ingredients)} новых ингридиентов'}
+        
 
 @app.route('/ingredient')
 def ingredient():
@@ -115,18 +142,18 @@ def ingredient():
      return render_template('ingredient.html', ingredients=ingredients, title=title)
 
 
-@app.route("/ingredient/<int:ingredient_id>/edit/", methods=['GET', 'POST'])  
-def edit_ingredient(ingredient_id):  
-    edited_ingredient = db.session.query(Ingredient).filter_by(id=ingredient_id).one()  
-    if request.method == 'POST':  
-        if request.form['name']:  
+@app.route("/ingredient/<int:ingredient_id>/edit/", methods=['GET', 'POST'])
+def edit_ingredient(ingredient_id):
+    edited_ingredient = db.session.query(Ingredient).filter_by(id=ingredient_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
             edited_ingredient.name = request.form['name']
             edited_ingredient.description = request.form['description']
             edited_ingredient.origin = request.form['origin']
             db.session.add(edited_ingredient)
-            db.session.commit() 
-            return redirect(url_for('ingredient', ingredient_id=ingredient_id))  
-    else:  
+            db.session.commit()
+            return redirect(url_for('ingredient', ingredient_id=ingredient_id))
+    else:
         return render_template('edit_ingredient.html', ingredient=edited_ingredient)
 
 @app.route('/ingredient/<int:ingredient_id>/delete', methods=['GET', 'POST'])
@@ -138,57 +165,6 @@ def delete_ingredient(ingredient_id):
         return redirect(url_for('ingredient', ingredient_id=ingredient_id))
     else:
         return render_template('delete_ingredient.html', ingredient=ingredient_to_delete)
-    
-
-@app.route('/parser_ingredient', methods=['POST'])
-def get_ingredient():
-    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
-    request = requests.get(url)
-    data = request.text
-    ingredient = json.loads(data)
-    new_ingredients = []
-    for item in ingredient['drinks']:
-        item['name'] = item.pop('strIngredient1')
-        drink_name = item['name']
-        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
-        new_url = default_url.format(drink_name)
-        ingredient_dict = requests.get(new_url).json()
-        for item in ingredient_dict['ingredients']:
-            ingredient_name = item['strIngredient']
-            description = item['strDescription']
-            origin = 'Неизвестно'
-            new_ingredient = Ingredient(name=ingredient_name, description=description, origin=origin)
-            new_ingredients.append(new_ingredient)
-           
-        db.session.bulk_save_objects(new_ingredients)
-        db.session.commit()
-        return render_template(new_ingredients)
-
-
-
-@app.route('/parser_ingredient', methods=['POST'])
-def get_ingredient():
-    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
-    request = requests.get(url)
-    data = request.text
-    ingredient = json.loads(data)
-    new_ingredients = []
-    for item in ingredient['drinks']:
-        item['name'] = item.pop('strIngredient1')
-        drink_name = item['name']
-        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
-        new_url = default_url.format(drink_name)
-        ingredient_dict = requests.get(new_url).json()
-        for item in ingredient_dict['ingredients']:
-            ingredient_name = item['strIngredient']
-            description = item['strDescription']
-            origin = 'Неизвестно'
-            new_ingredient = Ingredient(name=ingredient_name, description=description, origin=origin)
-            new_ingredients.append(new_ingredient)
-           
-        db.session.bulk_save_objects(new_ingredients)
-        db.session.commit()
-        return render_template(new_ingredients)
 
 
 @app.route('/cocktail')
@@ -239,12 +215,10 @@ def change_url():
                 new_cocktails.append(new_cocktail)
     db.session.bulk_save_objects(new_cocktails)
     db.session.commit()
-    return new_cocktails
+    return {'message': f'Создано {len(new_cocktails)} новых коктейлей'}
 
 
-
-
-@app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])  
+@app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])
 def edit_cocktail(cocktail_id):  
     edited_cocktail = db.session.query(Cocktail).filter_by(id=cocktail_id).one()  
     if request.method == 'POST':  
@@ -295,18 +269,18 @@ def new_origin():
     else:
         return render_template('new_origin.html')
 
-        
-@app.route("/origin/<int:origin_id>/edit/", methods=['GET', 'POST'])  
-def edit_origin(origin_id):  
-    edited_origin = db.session.query(Origin).filter_by(id=origin_id).one()  
-    if request.method == 'POST':  
-        if request.form['name']:  
+
+@app.route("/origin/<int:origin_id>/edit/", methods=['GET', 'POST'])
+def edit_origin(origin_id):
+    edited_origin = db.session.query(Origin).filter_by(id=origin_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
             edited_origin.country = request.form['country']
             edited_origin.region = request.form['region']
             db.session.add(edited_origin)
-            db.session.commit() 
-            return redirect(url_for('origin', origin_id=origin_id))  
-    else:  
+            db.session.commit()
+            return redirect(url_for('origin', origin_id=origin_id))
+    else:
         return render_template('edit_origin.html', origin=edited_origin)
 
 @app.route('/origin/<int:origin_id>/delete', methods=['GET', 'POST'])
