@@ -90,7 +90,6 @@ def admin_index():
     title = "Панель управления"
     return render_template('admin.html', title=title)
 
-
 @app.route('/ingredient/new', methods=['GET','POST'])
 
 def new_ingredient():
