@@ -98,6 +98,37 @@ def new_ingredient():
     else:
         return render_template('new_ingredient.html')
 
+
+@app.route('/parser_ingredient', methods=['POST'])
+def get_ingredient():
+    url = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list"
+    request = requests.get(url)
+    data = request.text
+    ingredient = json.loads(data)
+
+    existed_ingredients = [x.name for x in db.session.query(Ingredient).all()]
+    new_ingredients = []
+    for item in ingredient['drinks']:
+        item['name'] = item.pop('strIngredient1')
+        drink_name = item['name']
+        default_url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i={}"
+        new_url = default_url.format(drink_name)
+        ingredient_dict = requests.get(new_url).json()
+        for item in ingredient_dict['ingredients']:
+
+            ingredient_name = item['strIngredient']
+            if ingredient_name in existed_ingredients:
+                continue
+
+            description = item['strDescription']
+            new_ingredient = Ingredient(name=ingredient_name, description=description)
+            new_ingredients.append(new_ingredient)
+           
+    db.session.bulk_save_objects(new_ingredients)
+    db.session.commit()
+    return {'message': f'Создано {len(new_ingredients)} новых ингридиентов'}
+        
+
 @app.route('/ingredient')
 def ingredient():
      ingredients = db.session.query(Ingredient).all()
@@ -186,8 +217,7 @@ def change_url():
                 new_cocktails.append(new_cocktail)
     db.session.bulk_save_objects(new_cocktails)
     db.session.commit()
-    return new_cocktails
-
+    return {'message': f'Создано {len(new_cocktails)} новых коктейлей'}
 
 
 @app.route("/cocktail/<int:cocktail_id>/edit/", methods=['GET', 'POST'])
