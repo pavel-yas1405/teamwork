@@ -49,6 +49,7 @@ class Cocktail(db.Model):
     def __repr__(self):
         return '<Cocktail {} {} {} {} {}>'.format(self.name, self.description, self.country, self.region, self.recipe)
 
+
 class Ingredient(db.Model):
      __tablename__ = 'ingredient'
 

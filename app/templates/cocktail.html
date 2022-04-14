@@ -1,38 +1,37 @@
 {% extends "base.html" %}
 
-<html>
- <head>
-  <div>
-    <a href="{{ url_for('index') }}">Home</a>
-  </div>
-   <title>{{ title }}</title>
-   <form class="d-flex" method="GET">
-     <input class="form-control me-2" type="search" placeholder="Найти коктейль" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
-     <button class="btn btn-outline-success" type="submit">Искать</button>
- </form>
- </head>
- <body>
-  <style>
-    body {
-      background-image: linear-gradient(to right, beige, yellow, red, black)
-  }
-  </style>
-  <h1>Коктейли</h1>
-  <a href="{{ url_for('new_cocktail') }}">
-    <button>Добавить коктейль</button>
-  </a>
-  <ol>
-   {% for cocktail in cocktails %}
-    <li> {{cocktail.name}} - {{cocktail.description}} - {{cocktail.country}} - {{cocktail.region}}</li>
-    <p>{{ cocktail.recipe }}</p>
-    <a href="{{ url_for('edit_cocktail', cocktail_id = cocktail.id ) }}">
-      Изменить
-    </a>
-    <a href="{{ url_for('delete_cocktail', cocktail_id = cocktail.id ) }}" style="margin-left: 10px;">
-      Удалить
-    </a>
-    <br> <br>
-  {% endfor %}
- </ol>
- </body>
- </html>
+ {% block content %}
+ <div class="container">
+ </div>
+ <div class="row">
+     <div class="col-12">
+     <html>
+     <head>
+       <title>{{ title }}</title>
+     </head>
+     <body>
+      <style>
+        body {
+          background-image: linear-gradient(to bottom right, beige, green, red, white)  
+      }
+      </style>  
+     <h1>Коктейли</h1>
+     <a href="{{url_for('new_cocktail')}}">
+       <button>Добавить коктейль</button>
+     </a>
+     <ol>  
+       {% for cocktail in cocktails %}  
+       <li> {{cocktail.name}} - {{cocktail.description}}</li>
+       <p>{{ cocktail.recipe }}</p>
+       <a href="{{url_for('edit_cocktail', cocktail_id = cocktail.id )}}">  
+         Изменить  
+       </a>  
+       <a href="{{url_for('delete_cocktail', cocktail_id = cocktail.id )}}" style="margin-left: 10px;">  
+         Удалить  
+       </a>  
+       <br> <br>  
+     {% endfor %}  
+     </ol>
+     </body>
+     </html>
+ {% endblock %} 
