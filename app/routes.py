@@ -17,7 +17,6 @@ def load_user(user_id):
 
 @app.route('/')
 @app.route('/index')
-
 def index():
     title = "Карта коктейлей"
     return render_template('index.html', title=title)
@@ -91,7 +90,7 @@ def admin_index():
 @app.route('/ingredient/new', methods=['GET','POST'])
 def new_ingredient():
     if request.method == 'POST':
-        new_ingredient = Ingredient(name=request.form['name'], description=request.form['description'], origin=request.form['origin'])
+        new_ingredient = Ingredient(name=request.form['name'], description=request.form['description'])
         db.session.add(new_ingredient)
         db.session.commit()
         return redirect(url_for('ingredient'))
@@ -131,16 +130,16 @@ def get_ingredient():
 
 @app.route('/ingredient')
 def ingredient():
-     ingredients = db.session.query(Ingredient).all()
-     title = "Ингредиенты"
+    ingredients = db.session.query(Ingredient).all()
+    title = "Ингредиенты"
 
-     q = request.args.get('q')
+    q = request.args.get('q')
 
-     if q:
-         ingredients = Ingredient.query.filter(Ingredient.name.contains(q) | Ingredient.description.contains(q)).all()
-     else:
-         ingredients = Ingredient.query.all()
-     return render_template('ingredient.html', ingredients=ingredients, title=title)
+    if q:
+        ingredients = Ingredient.query.filter(Ingredient.name.contains(q) | Ingredient.description.contains(q)).all()
+    else:
+        ingredients = Ingredient.query.all()
+    return render_template('ingredient.html', ingredients=ingredients, title=title)
 
 
 @app.route("/ingredient/<int:ingredient_id>/edit/", methods=['GET', 'POST'])
@@ -150,7 +149,6 @@ def edit_ingredient(ingredient_id):
         if request.form['name']:
             edited_ingredient.name = request.form['name']
             edited_ingredient.description = request.form['description']
-            edited_ingredient.origin = request.form['origin']
             db.session.add(edited_ingredient)
             db.session.commit()
             return redirect(url_for('ingredient', ingredient_id=ingredient_id))
@@ -168,32 +166,31 @@ def delete_ingredient(ingredient_id):
         return render_template('delete_ingredient.html', ingredient=ingredient_to_delete)
 
 
-
-
 @app.route('/cocktail')
 def cocktail():
-     cocktails = db.session.query(Cocktail).all()
-     title = "Коктейли"
+    cocktails = db.session.query(Cocktail).all()
+    title = "Коктейли"
 
-     q = request.args.get('q')
+    q = request.args.get('q')
 
-     if q:
-         cocktails = Cocktail.query.filter(Cocktail.name.contains(q) | Cocktail.description.contains(q)).all()
-     else:
-         cocktails = Cocktail.query.all()
-     return render_template('cocktail.html', cocktails=cocktails, title=title)
+    if q:
+        cocktails = Cocktail.query.filter(Cocktail.name.contains(q) | Cocktail.description.contains(q)).all()
+    else:
+        cocktails = Cocktail.query.all()
+    return render_template('cocktail.html', cocktails=cocktails, title=title)
+
 
 
 
 @app.route('/cocktail/new', methods=['GET', 'POST'])
 def new_cocktail():
-     if request.method == 'POST':
-         new_cocktail = Cocktail(name=request.form['name'], description=request.form['description'], origin=request.form['origin'], recipe=request.form['recipe'])
-         db.session.add(new_cocktail)
-         db.session.commit()
-         return redirect(url_for('cocktail'))
-     else:
-         return render_template('new_cocktail.html')
+    if request.method == 'POST':
+        new_cocktail = Cocktail(name=request.form['name'], country=request.form['country'], description=request.form['description'], region=request.form['region'], recipe=request.form['recipe'])
+        db.session.add(new_cocktail)
+        db.session.commit()
+        return redirect(url_for('cocktail'))
+    else:
+        return render_template('new_cocktail.html')
 
 
 @app.route('/parse_cocktail', methods=['POST'])
@@ -213,7 +210,7 @@ def change_url():
             cocktail_name = cocktail['strDrink']
             if cocktail_name not in existed_cocktails:
                 cocktail_recipe = cocktail['strInstructions']
-                new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe, origin_id=1)
+                new_cocktail = Cocktail(name=cocktail_name, recipe=cocktail_recipe)
                 new_cocktails.append(new_cocktail)
     db.session.bulk_save_objects(new_cocktails)
     db.session.commit()
@@ -226,8 +223,9 @@ def edit_cocktail(cocktail_id):
     if request.method == 'POST':  
         if request.form['name']:  
             edited_cocktail.name = request.form['name']
+            edited_cocktail.country = request.form['country']
             edited_cocktail.description = request.form['description']
-            edited_cocktail.origin = request.form['origin']
+            edited_cocktail.region = request.form['region']
             edited_cocktail.recipe = request.form['recipe']
             db.session.add(edited_cocktail)
             db.session.commit() 
@@ -249,16 +247,16 @@ def delete_cocktail(cocktail_id):
 
 @app.route('/origin')
 def origin():
-     origins = db.session.query(Origin).all()
-     title = "Родина коктейля"
+    origins = db.session.query(Origin).all()
+    title = "Родина коктейля"
 
-     q = request.args.get('q')
+    q = request.args.get('q')
 
-     if q:
-         origins = Origin.query.filter(Origin.country.contains(q) | Origin.region.contains(q)).all()
-     else:
-         origins = Origin.query.all()
-     return render_template('origin.html', origins=origins, title=title)
+    if q:
+        origins = Origin.query.filter(Origin.country.contains(q) | Origin.region.contains(q)).all()
+    else:
+        origins = Origin.query.all()
+    return render_template('origin.html', origins=origins, title=title)
 
 
 @app.route('/origin/new', methods=['GET','POST'])
@@ -276,12 +274,11 @@ def new_origin():
 def edit_origin(origin_id):
     edited_origin = db.session.query(Origin).filter_by(id=origin_id).one()
     if request.method == 'POST':
-        if request.form['name']:
-            edited_origin.country = request.form['country']
-            edited_origin.region = request.form['region']
-            db.session.add(edited_origin)
-            db.session.commit()
-            return redirect(url_for('origin', origin_id=origin_id))
+        edited_origin.country = request.form['country']
+        edited_origin.region = request.form['region']
+        db.session.add(edited_origin)
+        db.session.commit()
+        return redirect(url_for('origin', origin_id=origin_id))
     else:
         return render_template('edit_origin.html', origin=edited_origin)
 

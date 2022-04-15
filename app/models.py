@@ -26,7 +26,6 @@ class User(db.Model, UserMixin):
 
 
 class Origin(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     country = db.Column(db.String)
@@ -39,7 +38,6 @@ class Origin(db.Model):
 
 class Cocktail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    origin_id = db.Column(db.Integer, db.ForeignKey('origin.id'), index=True, nullable=False)
     name = db.Column(db.String(64), index=True, unique=True)
     country = db.Column(db.String(64), index=True)
     description = db.Column(db.Text, nullable=True)
@@ -47,7 +45,7 @@ class Cocktail(db.Model):
     recipe = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
-        return '<Cocktail {} {} {} {} {}>'.format(self.name, self.description, self.country, self.region, self.recipe)
+        return '<Cocktail {} {} {} {} {}>'.format(self.name, self.country, self.description, self.region, self.recipe)
 
 
 class Ingredient(db.Model):
@@ -59,6 +57,20 @@ class Ingredient(db.Model):
 
      def __repr__(self):
          return '<Ingredient {} {}>'.format(self.name, self.description)
+
+
+class CocktailOrigin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cocktail_id = db.Column(db.Integer, db.ForeignKey('cocktail.id', ondelete='CASCADE'), nullable=False)
+    origin_id = db.Column(db.Integer, db.ForeignKey('origin.id', ondelete='CASCADE'), nullable=False)
+
+    __table_args__ = (
+    UniqueConstraint(
+        'cocktail_id',
+        'origin_id',
+        name='cocktail_id_origin_id_unq',
+    ),
+)
 
 
 class CocktailIngredient(db.Model):

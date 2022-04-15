@@ -30,4 +30,3 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Пользователь с таким почтовым адресом уже существует')
 
 
-
