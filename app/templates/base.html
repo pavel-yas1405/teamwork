@@ -12,14 +12,12 @@
   </head>
   <body>
         {% include 'menu.html' %}
-        <div class="container">
-        </div>
-        <div class="row">
-            <div class="col-8">
+
               {% block content %}{% endblock %}
                 <ul>
                     {% for message in messages %}
                     <li>{{ message }}</li>
+                    
                     {% endfor %}
                 </ul>
             </div>
