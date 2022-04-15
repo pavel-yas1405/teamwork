@@ -6,7 +6,7 @@
    <title>{{ title }}</title>
    <p></p>
    <form class="d-flex" method="GET">
-     <input class="form-control me-2" type="search" placeholder="Найти ингредиент" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
+     <input class="form-control me-2" href="{{ url_for('new_ingredient') }}" type="search" placeholder="Найти ингредиент" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
      <button class="btn btn-outline-success" type="submit"><span style="color: black;">Искать</span></button>
      <div class="col-8">
     </div>
