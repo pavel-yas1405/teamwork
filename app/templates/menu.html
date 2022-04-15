@@ -12,10 +12,9 @@
             </style>
           </li>
           </ul>
-        <form class="d-flex" method="GET">
-          <input class="form-control me-2" type="search" placeholder="Найти коктейль" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
-          <button class="btn btn-outline-success" type="submit"><span style="color: black;">Искать</span></button>
-      </form>
+
+          
+
       <ul class="navbar-nav">
           {% if current_user.is_authenticated %}
               <li class="nav-item"></li>
