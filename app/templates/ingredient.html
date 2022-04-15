@@ -1,35 +1,49 @@
+{% extends "base.html" %}
+
+ {% block content %}
 <html>
  <head>
-  <div>
-    <a href="{{ url_for('index') }}">Home</a>
-  </div>
    <title>{{ title }}</title>
+   <p></p>
    <form class="d-flex" method="GET">
      <input class="form-control me-2" type="search" placeholder="Найти ингредиент" aria-label="Search" name="q" value="{{ request.args.get('q', '') }}">
-     <button class="btn btn-outline-success" type="submit">Искать</button>
+     <button class="btn btn-outline-success" type="submit"><span style="color: black;">Искать</span></button>
+     <div class="col-8">
+    </div>
  </form>
- </head>  
+ </head> 
+ <p></p> 
  <body>
   <style>
     body {
-      background-image: linear-gradient(to right, beige, yellow, red, black)  
+      background-image: linear-gradient(to right, rgb(55, 69, 48), green, red, rgb(218, 163, 163))  
   }
   </style>   
   <h1>Ингредиенты</h1>
+  <p></p>
+  <style>
+    body {
+      color: white;
+      text-align: center;
+      text-shadow: 0 0 3px #7e5555, 0 0 5px #0a7c12;
+    }
+  </style>
   <a href="{{ url_for('new_ingredient') }}">
-    <button>Добавить ингредиент</button>  
+    <button>Добавить ингредиент</button>
+    <p></p>  
   </a>
   <ol>  
    {% for ingredient in ingredients %}  
     <li> {{ingredient.name}} - {{ingredient.description}}</li>
     <a href="{{ url_for('edit_ingredient', ingredient_id = ingredient.id ) }}">  
-      Изменить  
+      <span style="color: black;">Изменить</span>  
     </a>  
     <a href="{{ url_for('delete_ingredient', ingredient_id = ingredient.id ) }}" style="margin-left: 10px;">  
-      Удалить  
+      <span style="color: black;">Удалить</span>  
     </a>  
     <br> <br>  
   {% endfor %}  
  </ol>  
  </body>  
- </html>    
+ </html>
+ {% endblock %} 
