@@ -1,7 +1,20 @@
-<h2>Вы уверены, что хотите удалить {{ origin.name }}?</h2>  
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+  <style>
+    body {
+      background-image: linear-gradient(to right, rgb(55, 69, 48), green, red, rgb(218, 163, 163))  
+  }
+  </style>
+  </head> 
+<h2>Вы уверены, что хотите удалить {{ origin.name }}?</h2> 
+<p></p> 
 <form action="#" method='post'>  
   <button type="submit">Удалить</button>  
 </form>
+<p></p>
 <a href="{{ url_for('origin') }}">  
   <button>Отменить</button>  
 </a>
+{% endblock %}

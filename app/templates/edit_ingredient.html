@@ -1,3 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+  <style>
+    body {
+      background-image: linear-gradient(to right, rgb(55, 69, 48), green, red, rgb(218, 163, 163))  
+  }
+  </style>
+  </head> 
+<div class="row">
+  <div class="col-4">
 <form action="{{ url_for('edit_ingredient', ingredient_id = ingredient.id) }}" method="post">  
   <div class="form-group">
     
@@ -7,9 +19,11 @@
     <label for="description">Описание:</label> 
     <input class="form-control" name="description" value="{{ ingredient.description }}">
 
+    <p></p>
     <button type="submit">Обновить</button>
   </div>
 </form>
 <a href="{{ url_for('ingredient') }}">  
   <button>Отменить</button>  
-</a> 
+</a>
+{% endblock %} 
